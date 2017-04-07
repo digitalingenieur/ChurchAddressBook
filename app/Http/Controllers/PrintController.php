@@ -30,6 +30,7 @@ class PrintController extends Controller
 				'surname' => $json_person->name,
 				'name' => $json_person->vorname,
 				'ct_id' => intval($json_person->p_id),
+                //...
 				]);
 		}
 
@@ -66,12 +67,16 @@ class PrintController extends Controller
 		});
 		$sorted = $filteredCollection->sortBy('surname');
 
-		print_r($sorted->values()->all());
-
-		/*PDF::SetTitle('Hello World');
-	PDF::AddPage();
-	PDF::Write(0, 'Hello World');
-	PDF::Output('hello_world.pdf');*/
+		//print_r($sorted->values()->all());
+        $ruben = Person::where('name', 'ruben')->limit(1)->get();
+    
+        PDF::SetTitle('Hello World');
+        foreach($persons as $person){
+            PDF::AddPage();
+	        PDF::Write(0, 'Name: '.$person->name);    
+        }
+		
+	    PDF::Output('hello_world.pdf');
 	}
 
     
