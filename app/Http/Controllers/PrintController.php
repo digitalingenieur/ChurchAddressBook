@@ -24,11 +24,13 @@ class PrintController extends Controller
 		$api = new ChurchtoolsApi();
 		$allPersons = $api->getAllPerson();
 
-		//Put Information in Person Model (name, surname, partner?, children?...)
+		//Put Information in Person Model (name, surname, telefonprivat, geb, partner?, children?...)
 		foreach($allPersons as $json_id => $json_person){
 			$person = Person::create([
 				'surname' => $json_person->name,
 				'name' => $json_person->vorname,
+                'tel' => $json_person->telefonprivat,
+                'birthday' => $json_person->geb,
 				'ct_id' => intval($json_person->p_id),
                 //...
 				]);
@@ -71,7 +73,31 @@ class PrintController extends Controller
         $ruben = Person::where('name', 'ruben')->limit(1)->get();
     
         PDF::SetTitle('Hello World');
+        
+        //############################HEADER########################
+        PDF::setHeaderCallback(function($pdf){
+    
+        });
+        
+        //############################FOOTER########################
+        //Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=0, $link='', $stretch=0, $ignore_min_height=false, $calign='T', $valign='M')
+
+        PDF::setFooterCallback(function($pdf){
+            PDF::SetY(-15);
+            // Set font
+            PDF::SetFont('helvetica', 'I', 8);
+            // Footer Text
+            PDF::Cell(10, 10, 'Gemeindeverzeichnis',0 ,false , 'L', 0, '', 0, false, 'T', 'M');
+            // Page number
+            PDF::Cell(0, 10, 'Page '.PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, true, 'C', 0, '', 0, false, 'T', 'M');
+            
+
+            });
+        
+        
+            
         foreach($persons as $person){
+            
             PDF::AddPage();
 	        PDF::Write(0, 'Name: '.$person->name);    
         }
