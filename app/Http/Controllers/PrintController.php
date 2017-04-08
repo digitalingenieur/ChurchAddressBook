@@ -61,7 +61,7 @@ class PrintController extends Controller
 	//Make an PDF File (CMYK A5 etc) from Local Database
 	function generate(){
 		//TODO IMPLEMENT
-		$persons = Person::all();
+		$persons = Person::with('partner','children')->get();
 		
 
 		$filteredCollection = $persons->filter(function($value, $key){
@@ -70,7 +70,6 @@ class PrintController extends Controller
 		$sorted = $filteredCollection->sortBy('surname');
 
 		//print_r($sorted->values()->all());
-        $ruben = Person::where('name', 'ruben')->limit(1)->get();
     
         PDF::SetTitle('Hello World');
         
@@ -99,7 +98,21 @@ class PrintController extends Controller
         foreach($persons as $person){
             
             PDF::AddPage();
-	        PDF::Write(0, 'Name: '.$person->name);    
+	        PDF::Write(0, 'Name: '.$person->name); 
+
+
+	        //Partner /Direkter Aufruf möglich, da 1:1-beziehung
+	        if($person->partner){
+	        	PDF::Write(0, 'Partner: '.$person->partner->name); 
+	        }
+	        
+	        //Kinder   // Schleife, weil mehrere Kinder möglich sind
+	  
+	        	PDF::Write(0, 'Kinder: '); 
+	        	foreach($person->children as $children){
+	        		PDF::Write(0, $children->name); 		
+	        	}
+	        
         }
 		
 	    PDF::Output('hello_world.pdf');
