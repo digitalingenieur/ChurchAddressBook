@@ -61,7 +61,7 @@ class PrintController extends Controller
 	//Make an PDF File (CMYK A5 etc) from Local Database
 	function generate(){
 		//TODO IMPLEMENT
-		$persons = Person::all();
+		$persons = Person::with('partner','children')->get();
 		
 
 		$filteredCollection = $persons->filter(function($value, $key){
@@ -70,21 +70,15 @@ class PrintController extends Controller
 		$sorted = $filteredCollection->sortBy('surname');
 
 		//print_r($sorted->values()->all());
+        PDF::SetTitle('Hello World');
         
-        /*$samu = Person::where('name', 'samuel')->limit(1)->get();
-        echo $samu;
-        $partner = $samu->partner();
-        echo $partner;
-    
-        PDF::SetTitle('Hello World');*/
-        
-        //############################HEADER########################
+//-----HEADER-----
         PDF::setHeaderCallback(function($pdf){
     
         });
         
-        //############################FOOTER########################
-        //Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=0, $link='', $stretch=0, $ignore_min_height=false, $calign='T', $valign='M')
+//-----FOOTER-----
+     //Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=0, $link='', $stretch=0, $ignore_min_height=false, $calign='T', $valign='M')
 
         PDF::setFooterCallback(function($pdf){
             PDF::SetY(-15);
@@ -94,29 +88,43 @@ class PrintController extends Controller
             PDF::Cell(10, 10, 'Gemeindeverzeichnis',0 ,false , 'L', 0, '', 0, false, 'T', 'M');
             // Page number
             PDF::Cell(0, 10, PDF::getAliasNumPage(), 0, true, 'C', 0, '', 0, false, 'T', 'M');
-            
-
-            });
+         });
         
         
             
         foreach($persons as $person){
+
+                PDF::AddPage();
+                PDF::Write(0, $person->name.' '.$person->surname);  
+
+                PDF::Ln(5);
+
+               // PDF::Write(0, 'Name: '.$person->name); 
+
+
+                //Partner /Direkter Aufruf möglich, da 1:1-beziehung
+                    if($person->partner != NULL){
+                        PDF::Ln(5);
+                        PDF::Write(0, 'Partner: '.$person->partner->name); 
+                    }
             
-            
-            
-            PDF::AddPage();
-	        PDF::Write(0, $person->name.' '.$person->surname);  
-            
-            PDF::Ln(10);
-            
-            if($person->partner() != NULL){
-                PDF::Write(0, $person->partner()->name);
-            }
+                    PDF::Ln(5);
+
+                //Kinder   // Schleife, weil mehrere Kinder möglich sind
+                    $counterchild = 0;
+                    foreach($person->children as $children){
+                        $counterchild++;
+                        PDF::Write(0, 'Kind '.$counterchild.': '.$children->name); 
+                        PDF::Ln(5);
+                        //PDF::Write(0, $children->name); 		
+                    }
         }
 		
 	    PDF::Output('hello_world.pdf');
 	}
+    
 
+//-----AUSSCHIESEN-----
     
     function execute(){
     	$dir = new CAB();
