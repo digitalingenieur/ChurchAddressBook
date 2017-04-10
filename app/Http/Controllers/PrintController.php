@@ -70,9 +70,13 @@ class PrintController extends Controller
 		$sorted = $filteredCollection->sortBy('surname');
 
 		//print_r($sorted->values()->all());
-        $ruben = Person::where('name', 'ruben')->limit(1)->get();
+        
+        /*$samu = Person::where('name', 'samuel')->limit(1)->get();
+        echo $samu;
+        $partner = $samu->partner();
+        echo $partner;
     
-        PDF::SetTitle('Hello World');
+        PDF::SetTitle('Hello World');*/
         
         //############################HEADER########################
         PDF::setHeaderCallback(function($pdf){
@@ -85,11 +89,11 @@ class PrintController extends Controller
         PDF::setFooterCallback(function($pdf){
             PDF::SetY(-15);
             // Set font
-            PDF::SetFont('helvetica', 'I', 8);
+            PDF::SetFont('helvetica', '', 8);
             // Footer Text
             PDF::Cell(10, 10, 'Gemeindeverzeichnis',0 ,false , 'L', 0, '', 0, false, 'T', 'M');
             // Page number
-            PDF::Cell(0, 10, 'Page '.PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, true, 'C', 0, '', 0, false, 'T', 'M');
+            PDF::Cell(0, 10, PDF::getAliasNumPage(), 0, true, 'C', 0, '', 0, false, 'T', 'M');
             
 
             });
@@ -98,8 +102,16 @@ class PrintController extends Controller
             
         foreach($persons as $person){
             
+            
+            
             PDF::AddPage();
-	        PDF::Write(0, 'Name: '.$person->name);    
+	        PDF::Write(0, $person->name.' '.$person->surname);  
+            
+            PDF::Ln(10);
+            
+            if($person->partner() != NULL){
+                PDF::Write(0, $person->partner()->name);
+            }
         }
 		
 	    PDF::Output('hello_world.pdf');

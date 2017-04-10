@@ -1,6 +1,6 @@
 <?php
 return [
-	'page_format'           => 'A5',
+	'page_format'           => 'A6',
 	'page_orientation'      => 'P',
 	'page_units'            => 'mm',
 	'unicode'               => true,
