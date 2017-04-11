@@ -56,7 +56,7 @@ class PrintController extends Controller
 		//Set flag on Person if it's information are complete
 		//Skip if Person does have completion flag
 	}
-
+    
 
 	//Make an PDF File (CMYK A5 etc) from Local Database
 	function generate(){
@@ -71,6 +71,10 @@ class PrintController extends Controller
 
 		//print_r($sorted->values()->all());
         PDF::SetTitle('Hello World');
+        
+//-----IMPORT OPEN SANS-----        
+       
+       // $opensans = PDF::addTTFfont(‘/Users/RubenHeer/Downloads/Open_Sans.ttf’, ‘TrueTypeUnicode’, “, 12);
         
 //-----HEADER-----
         PDF::setHeaderCallback(function($pdf){
@@ -90,36 +94,51 @@ class PrintController extends Controller
             PDF::Cell(0, 10, PDF::getAliasNumPage(), 0, true, 'C', 0, '', 0, false, 'T', 'M');
          });
         
+        $check = array();
+        $taken = false;
         
-            
         foreach($persons as $person){
-
-                PDF::AddPage();
-                PDF::Write(0, $person->name.' '.$person->surname);  
-
-                PDF::Ln(5);
-
+                
+        //    PDF::SetFont('opensans', '', 12);
+            $person->taken = false;
+            
+            if (in_array($person->ct_id,$check)){
+               $person->taken = true; 
+            }
+                    
+                if ($person->taken == false) {
+                    PDF::AddPage();
+                    PDF::Write(0, $person->name.' '.$person->surname);  
+                    PDF::Ln(5);
+                }
+                
                // PDF::Write(0, 'Name: '.$person->name); 
-
 
                 //Partner /Direkter Aufruf möglich, da 1:1-beziehung
                     if($person->partner != NULL){
-                        PDF::Ln(5);
-                        PDF::Write(0, 'Partner: '.$person->partner->name); 
-                    }
-            
+                        if ($person->taken == false) {
+                            PDF::Ln(5);
+                            PDF::Write(0, 'Partner: '.$person->partner->name);  
+                            $check[] = $person->partner->ct_id;
+                        }
+                     }
+
                     PDF::Ln(5);
 
                 //Kinder   // Schleife, weil mehrere Kinder möglich sind
                     $counterchild = 0;
                     foreach($person->children as $children){
-                        $counterchild++;
-                        PDF::Write(0, 'Kind '.$counterchild.': '.$children->name); 
-                        PDF::Ln(5);
-                        //PDF::Write(0, $children->name); 		
+                        if ($person->taken == false) {
+                            $counterchild++;
+                            PDF::Write(0, 'Kind '.$counterchild.': '.$children->name); 
+                            PDF::Ln(5);
+                            //PDF::Write(0, $children->name);
+                        }
                     }
         }
 		
+        $taken = false;
+        PDF::lastPage();
 	    PDF::Output('hello_world.pdf');
 	}
     
