@@ -10,12 +10,11 @@ use PDF;
 use DB;
 use App\Person;
 
-
 class PrintController extends Controller
 {
     // Load Person Data from Churchtools and save as Models in Local Database
 	function load(){
-		
+                
 		Person::truncate();
 		DB::table('person_person')->truncate();
 
@@ -72,9 +71,15 @@ class PrintController extends Controller
 		//print_r($sorted->values()->all());
         PDF::SetTitle('Hello World');
         
-//-----IMPORT OPEN SANS-----        
+//-----IMPORT FONTS-----        
        
-       // $opensans = PDF::addTTFfont(‘/Users/RubenHeer/Downloads/Open_Sans.ttf’, ‘TrueTypeUnicode’, “, 12);
+        //Visit following Website -> Convert .ttf -> Add 3 files to fonts folder    
+        //http://fonts.snm-portal.com
+        // Fonts already added: Open Sans:  Regular     ->  opensans
+        //                                  Bold        ->  opensansb
+        //                                  Semibold    ->  opensanssemibold
+        //                                  Light       ->  opensanslight
+        //                      Font Awesome:           -> fontawesome
         
 //-----HEADER-----
         PDF::setHeaderCallback(function($pdf){
@@ -99,7 +104,7 @@ class PrintController extends Controller
         
         foreach($persons as $person){
                 
-        //    PDF::SetFont('opensans', '', 12);
+            PDF::SetFont('opensansb', '', 12);
             $person->taken = false;
             
             if (in_array($person->ct_id,$check)){
@@ -108,6 +113,9 @@ class PrintController extends Controller
                     
                 if ($person->taken == false) {
                     PDF::AddPage();
+                    PDF::SetFont('fontawesome', '', 12);
+                    PDF::Write(0, ' ');
+                    PDF::SetFont('opensansb', '', 12);
                     PDF::Write(0, $person->name.' '.$person->surname);  
                     PDF::Ln(5);
                 }
@@ -118,6 +126,7 @@ class PrintController extends Controller
                     if($person->partner != NULL){
                         if ($person->taken == false) {
                             PDF::Ln(5);
+                            PDF::SetFont('opensans', '', 12);
                             PDF::Write(0, 'Partner: '.$person->partner->name);  
                             $check[] = $person->partner->ct_id;
                         }
@@ -130,15 +139,18 @@ class PrintController extends Controller
                     foreach($person->children as $children){
                         if ($person->taken == false) {
                             $counterchild++;
+                            PDF::SetFont('opensans', '', 12);
                             PDF::Write(0, 'Kind '.$counterchild.': '.$children->name); 
                             PDF::Ln(5);
+                            //$check [] = $person->children->ct_id;
                             //PDF::Write(0, $children->name);
                         }
                     }
+                                
         }
 		
         $taken = false;
-        PDF::lastPage();
+        //PDF::lastPage();
 	    PDF::Output('hello_world.pdf');
 	}
     
