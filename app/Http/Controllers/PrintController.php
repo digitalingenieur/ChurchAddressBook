@@ -92,7 +92,7 @@ class PrintController extends Controller
         PDF::setFooterCallback(function($pdf){
             PDF::SetY(-15);
             // Set font
-            PDF::SetFont('helvetica', '', 8);
+            //PDF::SetFont('helvetica', '', 8);
             // Footer Text
             PDF::Cell(10, 10, 'Gemeindeverzeichnis',0 ,false , 'L', 0, '', 0, false, 'T', 'M');
             // Page number

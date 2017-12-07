@@ -5,9 +5,10 @@ return [
 	'page_units'            => 'mm',
 	'unicode'               => true,
 	'encoding'              => 'UTF-8',
-	'font_directory'        => '',
+	'font_directory'        => resource_path('fonts/'),
 	'image_directory'       => '',
-	'tcpdf_throw_exception' => false,
+	'tcpdf_throw_exception' => true,
+	'font_name_main'		=> 'opensans'
 
 	// See more info at the tcpdf_config.php file in TCPDF (if you do not set this here, TCPDF will use it default)
 	// https://raw.githubusercontent.com/tecnickcom/TCPDF/develop/config/tcpdf_config.php
